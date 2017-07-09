@@ -9,6 +9,7 @@ public class SingleServer implements Runnable {
 
     private final Socket incoming;
     private Logger logger = Logger.getLogger(this.getClass().getName());
+    private String clientName;
 
     SingleServer(Socket socket) {
         this.incoming = socket;
@@ -24,6 +25,10 @@ public class SingleServer implements Runnable {
             input = incoming.getInputStream();
             output = incoming.getOutputStream();
             logger.log(Level.INFO, "get Input and Output stream");
+
+            byte[] clientNameByByte = new byte[32];
+            input.read(clientNameByByte);
+            clientName = new String(clientNameByByte);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -36,7 +41,7 @@ public class SingleServer implements Runnable {
                 try {
                     input.read(readBuf);
                     logger.log(Level.INFO, "Server read from client:");
-                    System.out.println(new String(readBuf));
+                    System.out.println(clientName + ": " + new String(readBuf));
                 } catch (IOException e) {
                     System.out.println("Exception on readSocket thread");
                 }
