@@ -1,6 +1,9 @@
 package ru.denko;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -8,24 +11,27 @@ import java.util.logging.Logger;
 public class SingleServer implements Runnable {
 
     private final Socket incoming;
+    private InputStream input;
+    private OutputStream output;
     private Logger logger = Logger.getLogger(this.getClass().getName());
     private String clientName;
+    private int closed;
 
     SingleServer(Socket socket) {
         this.incoming = socket;
         logger.log(Level.INFO, "New client connected");
+        try {
+            input = incoming.getInputStream();
+            output = incoming.getOutputStream();
+        } catch (IOException e) {
+            e.getStackTrace();
+        }
+        logger.log(Level.INFO, "get Input and Output stream");
     }
-
-    private InputStream input;
-    private OutputStream output;
 
     @Override
     public void run() {
         try {
-            input = incoming.getInputStream();
-            output = incoming.getOutputStream();
-            logger.log(Level.INFO, "get Input and Output stream");
-
             byte[] clientNameByByte = new byte[32];
             input.read(clientNameByByte);
             clientName = new String(clientNameByByte);
@@ -39,7 +45,10 @@ public class SingleServer implements Runnable {
             //InputStream in = new BufferedInputStream(input);
             while (true) {
                 try {
-                    input.read(readBuf);
+                    closed = input.read(readBuf);
+                    if (closed == -1) {
+                        break;
+                    }
                     logger.log(Level.INFO, "Server read from client:");
                     System.out.println(clientName + ": " + new String(readBuf));
                 } catch (IOException e) {
@@ -63,10 +72,12 @@ public class SingleServer implements Runnable {
                 } catch (IOException e) {
                     System.out.println("Exception in consoleRead thread");
                 }
+                if (closed == -1) {
+                    break;
+                }
             }
         });
         consoleRead.start();
-
     }
 }
 
