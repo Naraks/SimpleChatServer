@@ -7,23 +7,24 @@ import java.util.Map;
 public class ClientList {
     private Map<String, Socket> clients = new HashMap<>();
 
-    public void addClient(String name, Socket socket) {
+    void addClient(String name, Socket socket) {
         clients.put(name, socket);
     }
 
-    public Socket getClientSocket(String name) {
+    Socket getClientSocket(String name) {
         return clients.get(name);
     }
 
-    public void removeClient(String name) {
+    void removeClient(String name) {
         clients.remove(name);
     }
 
     @Override
     public String toString() {
+        StringBuilder r = new StringBuilder();
         for (Map.Entry<String, Socket> entry : clients.entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
+            r.append(entry.getKey()).append(": ").append(entry.getValue());
         }
-        return "";
+        return new String(r);
     }
 }
