@@ -95,9 +95,17 @@ public class SingleServer implements Runnable {
 
     private void writeToClient(String to, String msg) throws IOException {
         logger.log(Level.INFO, "Sending message to " + to);
-        DataOutputStream out = new DataOutputStream(new BufferedOutputStream(clientList.getClientSocket(to).getOutputStream()));
-        out.writeUTF(msg);
-        out.flush();
+        if (to.equals("")) {
+            for (Object key : clientList.map().keySet()) {
+                DataOutputStream out = new DataOutputStream(new BufferedOutputStream(clientList.getClientSocket((String) key).getOutputStream()));
+                out.writeUTF(msg);
+                out.flush();
+            }
+        } else {
+            DataOutputStream out = new DataOutputStream(new BufferedOutputStream(clientList.getClientSocket(to).getOutputStream()));
+            out.writeUTF(msg);
+            out.flush();
+        }
     }
 }
 

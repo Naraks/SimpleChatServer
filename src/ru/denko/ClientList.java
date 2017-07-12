@@ -19,6 +19,10 @@ public class ClientList {
         clients.remove(name);
     }
 
+    Map map() {
+        return clients;
+    }
+
     @Override
     public String toString() {
         StringBuilder r = new StringBuilder();
