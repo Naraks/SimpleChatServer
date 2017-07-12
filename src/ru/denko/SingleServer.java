@@ -73,7 +73,6 @@ public class SingleServer implements Runnable {
                     to = readClient();
                     msg = readClient();
                     logger.log(Level.INFO, "Server read from client:");
-                    System.out.println(to + ": " + msg); //убрать после тестов
                     writeToClient(to, clientName + ": " + msg);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -90,7 +89,12 @@ public class SingleServer implements Runnable {
 
     private String readClient() throws IOException {
         DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-        return in.readUTF();
+        String msg = in.readUTF();
+        if (msg.equals("EXIT")) {
+            clientList.removeClient(clientName);
+            socket.close();
+        }
+        return msg;
     }
 
     private void writeToClient(String to, String msg) throws IOException {
@@ -102,9 +106,14 @@ public class SingleServer implements Runnable {
                 out.flush();
             }
         } else {
-            DataOutputStream out = new DataOutputStream(new BufferedOutputStream(clientList.getClientSocket(to).getOutputStream()));
-            out.writeUTF(msg);
-            out.flush();
+            Socket s = clientList.getClientSocket(to);
+            if (s == null) {
+                writeToClient(clientName, to + " not found");
+            } else {
+                DataOutputStream out = new DataOutputStream(new BufferedOutputStream(clientList.getClientSocket(to).getOutputStream()));
+                out.writeUTF(msg);
+                out.flush();
+            }
         }
     }
 }
