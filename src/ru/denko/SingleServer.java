@@ -20,6 +20,9 @@ public class SingleServer implements Runnable {
         logger.log(Level.INFO, "New client connected");
     }
 
+    /**
+     * Create new threads for write to client and read client/console
+     */
     @Override
     public void run() {
         try {

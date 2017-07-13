@@ -6,6 +6,11 @@ import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Create for each new connected client own server
+ *
+ * @throws IOException
+ */
 class SimpleServer {
 
     private final int port;
